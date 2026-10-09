@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="hi">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DubIndia — Hindustani Dubbing Tool</title>
+  <meta name="description"
+    content="Kisi bhi video ko natural Hindustani (Hindi+Urdu+English mix) mein dub karo. No AI model, multi-speaker, BGM preserve." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Noto+Sans+Devanagari:wght@400;600;700&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="static/style.css" />
+</head>
+
+<body>
+  <!-- Background animated orbs -->
+  <div class="bg-orbs" aria-hidden="true">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+  </div>
+
+  <header class="header">
+    <div class="logo">
+      <span class="logo-icon">🎙️</span>
+      <span class="logo-text">DubIndia</span>
+      <span class="logo-badge">BETA</span>
+    </div>
+    <nav class="header-info">
+      <span class="tech-pill">Whisper</span>
+      <span class="tech-pill">Edge-TTS</span>
+      <span class="tech-pill">Demucs</span>
+    </nav>
+  </header>
+
+  <main class="main">
+    <!-- Hero -->
+    <section class="hero">
+      <h1 class="hero-title">
+        Kisi bhi video ko<br />
+        <span class="gradient-text">Natural Hindustani</span><br />
+        mein dub karo
+      </h1>
+      <p class="hero-sub">
+        Hindi + Urdu + English mix — bilkul waisa jaise hum Indians aapas mein bolte hain.<br />
+        Multi-speaker · Gender-matched · BGM preserve · No AI model
+      </p>
+    </section>
+
+    <!-- Upload Card -->
+    <section class="card upload-card" id="upload-section">
+      <div class="drop-zone" id="drop-zone">
+        <div class="drop-inner" id="drop-inner">
+          <div class="drop-icon">🎬</div>
+          <p class="drop-title">Video yahan drag & drop karo</p>
+          <p class="drop-sub">ya click karke choose karo</p>
+          <p class="drop-formats">MP4 · MKV · MOV · WEBM · AVI · M4V</p>
+          <input type="file" id="file-input" accept="video/*" hidden />
+        </div>
+        <div class="drop-preview" id="drop-preview" hidden>
+          <div class="preview-icon">🎞️</div>
+          <div class="preview-info">
+            <span class="preview-name" id="preview-name"></span>
+            <span class="preview-size" id="preview-size"></span>
+          </div>
+          <button class="preview-remove" id="preview-remove" title="Hata do">✕</button>
+        </div>
+      </div>
+
+      <!-- Settings -->
+      <div class="settings-grid">
+        <div class="setting-group">
+          <label class="setting-label" for="model-select">
+            🧠 Whisper Model
+            <span class="setting-hint">Chhota = fast, Bada = accurate</span>
+          </label>
+          <select class="setting-select" id="model-select">
+            <option value="tiny">Tiny (fastest, ~1 min)</option>
+            <option value="base">Base (fast, ~2 min)</option>
+            <option value="small" selected>Small (recommended)</option>
+            <option value="medium">Medium (accurate)</option>
+            <option value="large">Large (best quality)</option>
+          </select>
+        </div>
+
+        <div class="setting-group">
+          <label class="setting-label" for="speakers-input">
+            👥 Speakers (optional)
+            <span class="setting-hint">Pata ho to likho, nahi to khali chodo</span>
+          </label>
+          <input class="setting-input" type="number" id="speakers-input" placeholder="Auto detect" min="1" max="10" />
+        </div>
+
+        <div class="setting-group">
+          <label class="setting-label" for="voice-vol">
+            🎤 Voice Volume
+            <span class="setting-vol-val" id="voice-vol-val">100%</span>
+          </label>
+          <input class="setting-range" type="range" id="voice-vol" min="0.3" max="2.0" step="0.05" value="1.0" />
+        </div>
+
+        <div class="setting-group">
+          <label class="setting-label" for="bg-vol">
+            🎵 BGM Volume
+            <span class="setting-vol-val" id="bg-vol-val">35%</span>
+          </label>
+          <input class="setting-range" type="range" id="bg-vol" min="0.0" max="1.0" step="0.05" value="0.35" />
+        </div>
+
+        <div class="setting-group" style="grid-column: 1 / -1;">
+          <label class="setting-label toggle-wrap" for="skip-bgm-toggle">
+            <span>
+              ⚡ Fast Mode (Skip BGM Separation)
+              <span class="setting-hint">Demucs skip karo — BGM bleeds, but 5x faster. Recommended for testing.</span>
+            </span>
+            <div class="toggle-switch">
+              <input type="checkbox" id="skip-bgm-toggle" />
+              <span class="toggle-slider"></span>
+            </div>
+          </label>
+        </div>
+      </div>
+
+      <button class="btn-dub" id="btn-dub" disabled>
+        <span class="btn-icon">🎙️</span>
+        <span class="btn-text">Dub Shuru Karo</span>
+      </button>
+    </section>
+
+    <!-- Progress Card -->
+    <section class="card progress-card" id="progress-card" hidden>
+      <div class="progress-header">
+        <div class="progress-title-row">
+          <h2 class="progress-title">Dubbing chal rahi hai...</h2>
+          <span class="progress-pct" id="progress-pct">0%</span>
+        </div>
+        <div class="progress-bar-wrap">
+          <div class="progress-bar" id="progress-bar" style="width:0%"></div>
+        </div>
+        <p class="progress-stage" id="progress-stage">Starting...</p>
+      </div>
+
+      <!-- Pipeline steps -->
+      <div class="pipeline-steps" id="pipeline-steps">
+        <div class="step" data-step="1">
+          <div class="step-dot"></div>
+          <div class="step-info">
+            <span class="step-name">Audio Extract</span>
+          </div>
+        </div>
+        <div class="step" data-step="2">
+          <div class="step-dot"></div>
+          <div class="step-info">
+            <span class="step-name">Voice/BGM Alag (Demucs)</span>
+          </div>
+        </div>
+        <div class="step" data-step="3">
+          <div class="step-dot"></div>
+          <div class="step-info">
+            <span class="step-name">Speech Samajhna (Whisper)</span>
+          </div>
+        </div>
+        <div class="step" data-step="4">
+          <div class="step-dot"></div>
+          <div class="step-info">
+            <span class="step-name">Speaker + Gender Detect</span>
+          </div>
+        </div>
+        <div class="step" data-step="5">
+          <div class="step-dot"></div>
+          <div class="step-info">
+            <span class="step-name">Hindustani Translation</span>
+          </div>
+        </div>
+        <div class="step" data-step="6">
+          <div class="step-dot"></div>
+          <div class="step-info">
+            <span class="step-name">Hindi TTS (Edge-TTS)</span>
+          </div>
+        </div>
+        <div class="step" data-step="7">
+          <div class="step-dot"></div>
+          <div class="step-info">
+            <span class="step-name">Mix + Final Video</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Live logs -->
+      <div class="log-panel">
+        <div class="log-header">
+          <span>📋 Live Log</span>
+          <button class="log-clear" id="log-clear">Clear</button>
+        </div>
+        <div class="log-body" id="log-body"></div>
+      </div>
+    </section>
+
+    <!-- Result Card -->
+    <section class="card result-card" id="result-card" hidden>
+      <div class="result-hero">
+        <div class="result-icon">✅</div>
+        <h2 class="result-title">Dubbing Complete!</h2>
+        <p class="result-sub">Aapki Hindustani dubbed video timeline cuts ke saath ready hai</p>
+      </div>
+
+      <div class="result-stats" id="result-stats">
+        <!-- filled dynamically -->
+      </div>
+
+      <!-- Video Player Preview -->
+      <div class="video-preview-card" id="video-preview-card">
+        <div class="video-preview-header">
+          <span class="preview-title">🎬 Video Preview (Player)</span>
+          <span class="preview-badge">Dubbed + Synced</span>
+        </div>
+        <div class="video-wrapper">
+          <video id="result-video" controls playsinline preload="metadata" class="result-video-player"></video>
+        </div>
+      </div>
+
+      <!-- Timeline Dialogue Cuts -->
+      <div class="timeline-cuts-card" id="timeline-cuts-card">
+        <div class="timeline-cuts-header">
+          <div>
+            <h3 class="timeline-cuts-title">⏱️ Timeline Dialogue Cuts</h3>
+            <p class="timeline-cuts-sub">Har cut ki exact timing aur dialog dekho. Click karke video seek karo.</p>
+          </div>
+          <span class="cuts-counter" id="cuts-counter">0 Cuts</span>
+        </div>
+        <div class="timeline-cuts-list" id="timeline-cuts-list">
+          <!-- Filled dynamically with cuts -->
+        </div>
+      </div>
+
+      <div class="result-actions">
+        <button class="btn-download" id="btn-download">
+          <span>⬇️</span> Download Dubbed Video
+        </button>
+        <button class="btn-download btn-download-srt" id="btn-download-srt">
+          <span>📜</span> Download Subtitles (.SRT)
+        </button>
+        <button class="btn-again" id="btn-again">
+          <span>🔄</span> Naya Video Dub Karo
+        </button>
+      </div>
+    </section>
+
+    <!-- Error Card -->
+    <section class="card error-card" id="error-card" hidden>
+      <div class="error-hero">
+        <div class="error-icon">❌</div>
+        <h2 class="error-title">Kuch Error Aayi</h2>
+        <p class="error-msg" id="error-msg"></p>
+      </div>
+      <button class="btn-again" id="btn-again-err">
+        <span>🔄</span> Phir Try Karo
+      </button>
+    </section>
+
+    <!-- Features -->
+    <section class="features" id="features-section">
+      <h2 class="features-title">Kya karta hai yeh tool?</h2>
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon">🎭</div>
+          <h3>Natural Hindustani</h3>
+          <p>Hindi + Urdu + English ka wahi mix jo hum Indians actually bolte hain. Koi bookish translation nahi.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">👥</div>
+          <h3>Multi-Speaker</h3>
+          <p>Automatically alag-alag characters ki awaaz detect karta hai aur unhe sahi gender ki Hindi voice deta hai.
+          </p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🎵</div>
+          <h3>BGM Preserve</h3>
+          <p>Demucs AI se background music bilkul same rehta hai — sirf dialogue replace hota hai.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🌍</div>
+          <h3>Any Language</h3>
+          <p>English, Japanese, Korean, Spanish, French — koi bhi language ka video upload karo.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">⚡</div>
+          <h3>No AI Cloud</h3>
+          <p>Sab kuch local chal ta hai. No OpenAI, no paid APIs — completely free aur private.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">⏱️</div>
+          <h3>Time-Fitted</h3>
+          <p>Hindi TTS ko automatically speed up karke original dialogue ki timing mein fit karta hai.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p>DubIndia — Hindustani Dubbing Tool &nbsp;·&nbsp; Powered by Whisper · Edge-TTS · Demucs</p>
+  </footer>
+
+  <script src="static/app.js"></script>
+</body>
+
+</html>
