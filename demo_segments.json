@@ -1,0 +1,35 @@
+[
+ {
+  "file": "seg_a_title.mp3",
+  "dur": 4.368,
+  "beat_start": 0.0,
+  "beat_dur": 4.968
+ },
+ {
+  "file": "seg_b_narr.mp3",
+  "dur": 6.616,
+  "beat_start": 4.968,
+  "beat_dur": 7.216
+ },
+ {
+  "file": "seg_c_male.mp3",
+  "dur": 4.74,
+  "beat_start": 12.184,
+  "beat_dur": 5.34
+ },
+ {
+  "file": "seg_d_female.mp3",
+  "dur": 4.267,
+  "beat_start": 17.524,
+  "beat_dur": 4.867
+ },
+ {
+  "file": "seg_e_soft.mp3",
+  "dur": 9.777,
+  "beat_start": 22.391,
+  "beat_dur": 10.377
+ },
+ {
+  "total": 32.768
+ }
+]

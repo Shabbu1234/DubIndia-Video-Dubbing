@@ -1,0 +1,47 @@
+# Python & Byte-compiled
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+venv/
+env/
+
+# Media & Audio/Video files (large binaries)
+*.mp4
+*.mp3
+*.wav
+*.flac
+*.ogg
+*.pdf
+*.mkv
+*.mov
+*.avi
+*.webm
+
+# Temporary work directories & outputs
+*_dub_work/
+out/
+vt/
+vtmp/
+qc/
+qc_frames/
+qc_full/
+segs/
+test_build/
+voices/
+kanta_dub_work/
+test_input_dub_work/
+dubbing_app/dub_jobs/
+
+# Logs & temp
+*.log
+
+# IDE & OS
+.idea/
+.vscode/
+.cursor/
+.agents/
+.mimosa/
+.jetro/
+.DS_Store
+Thumbs.db

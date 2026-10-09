@@ -1,0 +1,19 @@
+=== CREDITS (video description mein copy-paste karo) ===
+
+Music:
+"Impact Prelude", "Ossuary 5 - Rest", "Anguish", "Heart of Nowhere",
+"Meditation Impromptu 02", "Crypto", "Crossing the Divide", "Giant Wyrm",
+"Rising Tide" by Kevin MacLeod (incompetech.com)
+Licensed under Creative Commons: By Attribution 4.0
+http://creativecommons.org/licenses/by/4.0/
+
+Sound Effects (Wikimedia Commons):
+- Camera shutter: "Canon T50 shutter noise" (CC BY-SA 3.0)
+- Night wind: "20221229 - Abisko Turiststation at night" (CC BY-SA 4.0)
+- Thunder: "Thunder Small Rumble-Car-Large Crack-Rain" (CC BY-SA 4.0)
+
+Story: Solo Leveling - Chapter 108 (art: DUBU / REDICE Studio, story: h-goon,
+original novel: Chugong). Fan-made narration video; all rights to the original
+work belong to their respective owners.
+
+Voices: Microsoft Edge neural TTS (hi-IN), 10 character configurations.

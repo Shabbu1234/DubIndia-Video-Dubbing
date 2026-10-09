@@ -1,0 +1,11 @@
+flask>=3.0
+numpy>=1.24
+openai-whisper
+faster-whisper
+edge-tts
+demucs
+resemblyzer
+librosa
+deep-translator
+requests
+torch

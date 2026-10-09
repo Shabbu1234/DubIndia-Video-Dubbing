@@ -1,0 +1,16 @@
+{
+  "mcpServers": {
+    "jetro": {
+      "type": "stdio",
+      "command": "C:\\Users\\PC\\.jetro\\runtime\\node-win32-x64.exe",
+      "args": [
+        "C:\\Users\\PC\\.jetro\\mcp-server\\index.js"
+      ],
+      "env": {
+        "JET_WORKSPACE": "c:\\Users\\PC\\Desktop\\10th\\montege\\comics to videos",
+        "JET_API_URL": "https://api.jetro.ai",
+        "PATH": "C:\\Users\\PC\\.jetro\\runtime;C:\\Program Files\\Eclipse Adoptium\\jdk-25.0.2.10-hotspot\\bin;C:\\Python314\\Scripts\\;C:\\Python314\\;C:\\Windows\\system32;C:\\Windows;C:\\Windows\\System32\\Wbem;C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\;C:\\Windows\\System32\\OpenSSH\\;C:\\mingw64\\bin;C:\\ProgramData\\chocolatey\\bin;C:\\Program Files\\qemu;C:\\Program Files\\GitHub CLI\\;C:\\Program Files\\Git\\cmd;C:\\Program Files\\nodejs\\;C:\\Users\\PC\\.local\\bin;C:\\Users\\PC\\AppData\\Local\\pnpm;C:\\Users\\PC\\AppData\\Local\\hermes\\hermes-agent\\venv\\Scripts;C:\\Users\\PC\\AppData\\Local\\hermes\\bin;\\\\?\\C:\\Users\\PC\\AppData\\Local\\Programs\\Jan\\resources\\bin;C:\\Users\\PC\\AppData\\Local\\Programs\\Python\\Python311\\Scripts\\;C:\\Users\\PC\\AppData\\Local\\Programs\\Python\\Python311\\;C:\\\\Users\\\\PC\\\\AppData\\\\Local\\\\Blackbox\\\\bin;C:\\Users\\PC\\AppData\\Local\\Microsoft\\WindowsApps;C:\\Users\\PC\\AppData\\Local\\Programs\\Microsoft VS Code\\bin;C:\\flutter\\bin;C:\\Users\\PC\\AppData\\Local\\Pub\\Cache\\bin;C:\\Users\\PC\\AppData\\Local\\Programs\\Ollama;C:\\Users\\PC\\AppData\\Local\\Programs\\Antigravity\\bin;C:\\Users\\PC\\.local\\bin;C:\\Program Files\\JetBrains\\IntelliJ IDEA 2026.1\\bin;C:\\Users\\PC\\AppData\\Local\\Microsoft\\WinGet\\Links;C:\\Users\\PC\\AppData\\Local\\Programs\\Antigravity IDE\\bin;C:\\Users\\PC\\AppData\\Roaming\\npm;C:\\Users\\PC\\AppData\\Local\\Programs\\cursor\\resources\\app\\bin;C:\\Users\\PC\\AppData\\Local\\Programs\\DockerDesktop\\resources\\bin"
+      }
+    }
+  }
+}
