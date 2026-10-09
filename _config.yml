@@ -1,2 +1,8 @@
-theme: null
-title: DubIndia — Hindustani Dubbing Tool
+include:
+  - index.html
+  - static
+exclude:
+  - README.md
+  - AGENT.md
+  - CLAUDE.md
+  - dubbing_app
