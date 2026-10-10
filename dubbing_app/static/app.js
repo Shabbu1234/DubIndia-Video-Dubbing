@@ -166,6 +166,61 @@ function showProgress(pct, stage) {
   updateSteps(pct);
 }
 
+// ── Backend URL & Environment Helper ───────────────────────────────────────
+function getApiBase() {
+  return (localStorage.getItem("dubindia_backend_url") || "").trim().replace(/\/+$/, "");
+}
+
+function getApiUrl(endpoint) {
+  const base = getApiBase();
+  const path = endpoint.startsWith("/") ? endpoint : "/" + endpoint;
+  return base ? `${base}${path}` : path;
+}
+
+// Initialize backend connection banner (auto on GitHub Pages)
+const backendBanner = document.getElementById("backend-banner");
+const backendUrlInput = document.getElementById("backend-url-input");
+const backendSaveBtn = document.getElementById("backend-save-btn");
+const backendStatusBadge = document.getElementById("backend-status-badge");
+
+const isGitHubPages = window.location.hostname.endsWith("github.io");
+
+if (backendBanner) {
+  if (isGitHubPages || localStorage.getItem("dubindia_backend_url")) {
+    backendBanner.hidden = false;
+  }
+
+  const savedUrl = localStorage.getItem("dubindia_backend_url") || "";
+  if (backendUrlInput) {
+    backendUrlInput.value = savedUrl;
+  }
+  if (savedUrl && backendStatusBadge) {
+    backendStatusBadge.textContent = "Custom Backend Configured";
+    backendStatusBadge.classList.add("connected");
+  }
+
+  if (backendSaveBtn && backendUrlInput) {
+    backendSaveBtn.addEventListener("click", () => {
+      const val = backendUrlInput.value.trim().replace(/\/+$/, "");
+      if (val) {
+        localStorage.setItem("dubindia_backend_url", val);
+        if (backendStatusBadge) {
+          backendStatusBadge.textContent = "Saved: " + val;
+          backendStatusBadge.classList.add("connected");
+        }
+        alert("Backend server URL save ho gaya:\n" + val);
+      } else {
+        localStorage.removeItem("dubindia_backend_url");
+        if (backendStatusBadge) {
+          backendStatusBadge.textContent = isGitHubPages ? "GitHub Pages Mode" : "Local Mode";
+          backendStatusBadge.classList.remove("connected");
+        }
+        alert("Backend server URL reset ho gaya (Default mode).");
+      }
+    });
+  }
+}
+
 function fmtTime(sec) {
   const m = Math.floor(sec / 60);
   const s = (sec % 60).toFixed(1);
@@ -191,7 +246,7 @@ function showResult(summary, jobId, cuts = []) {
   // Setup Video Player preview
   const resultVideo = document.getElementById("result-video");
   if (resultVideo) {
-    resultVideo.src = `/api/video/${jobId}`;
+    resultVideo.src = getApiUrl(`/api/video/${jobId}`);
     resultVideo.load();
   }
 
@@ -246,13 +301,13 @@ function showResult(summary, jobId, cuts = []) {
   }
 
   btnDownload.onclick = () => {
-    window.location.href = `/api/download/${jobId}`;
+    window.location.href = getApiUrl(`/api/download/${jobId}`);
   };
 
   const btnSrt = document.getElementById("btn-download-srt");
   if (btnSrt) {
     btnSrt.onclick = () => {
-      window.location.href = `/api/subtitles/${jobId}`;
+      window.location.href = getApiUrl(`/api/subtitles/${jobId}`);
     };
   }
 }
@@ -265,7 +320,7 @@ function showError(msg) {
 // ── SSE log stream ─────────────────────────────────────────────────────────
 function startLogStream(jobId) {
   if (sseSource) sseSource.close();
-  sseSource = new EventSource(`/api/logs/${jobId}`);
+  sseSource = new EventSource(getApiUrl(`/api/logs/${jobId}`));
   sseSource.onmessage = e => {
     try {
       const d = JSON.parse(e.data);
@@ -281,7 +336,10 @@ function startPolling(jobId) {
   if (statusInterval) clearInterval(statusInterval);
   statusInterval = setInterval(async () => {
     try {
-      const r = await fetch(`/api/status/${jobId}`);
+      const r = await fetch(getApiUrl(`/api/status/${jobId}`));
+      if (!r.ok) {
+        throw new Error(`HTTP ${r.status}`);
+      }
       const d = await r.json();
       showProgress(d.progress || 0, d.stage);
       if (d.status === "done") {
@@ -303,6 +361,25 @@ function startPolling(jobId) {
 btnDub.addEventListener("click", async () => {
   if (!selectedFile) return;
 
+  const apiBase = getApiBase();
+
+  // Guard against running on GitHub Pages without configured backend
+  if (isGitHubPages && !apiBase) {
+    showError(
+      "⚠️ GitHub Pages sirf static HTML host karta hai — Python/Whisper backend nahi chala sakta!\n\n" +
+      "Isko chalane ke 2 aasan tareeqe hain:\n\n" +
+      "1️⃣ PC par Local chalao (Recommended):\n" +
+      "Project folder mein 'start.bat' par double-click karein aur browser mein http://localhost:5050 kholein.\n\n" +
+      "2️⃣ GitHub Pages ke saath Backend Connect karein:\n" +
+      "Apne computer par server chala kar Ngrok / Cloudflare Tunnel ka URL upar diye gaye 'Backend Server Connection' box mein paste karein."
+    );
+    if (backendBanner) {
+      backendBanner.hidden = false;
+      backendBanner.scrollIntoView({ behavior: "smooth" });
+    }
+    return;
+  }
+
   const fd = new FormData();
   fd.append("video", selectedFile);
   fd.append("model", modelSelect.value);
@@ -315,19 +392,35 @@ btnDub.addEventListener("click", async () => {
   addLog("Video upload ho rahi hai...", "info");
 
   try {
-    const r = await fetch("/api/upload", { method: "POST", body: fd });
+    const uploadUrl = getApiUrl("/api/upload");
+    const r = await fetch(uploadUrl, { method: "POST", body: fd });
     if (!r.ok) {
-      const err = await r.json();
-      showError(err.error || "Upload failed");
+      let errMsg = `Server error (${r.status} ${r.statusText})`;
+      try {
+        const err = await r.json();
+        errMsg = err.error || errMsg;
+      } catch {
+        if (r.status === 404) {
+          errMsg = isGitHubPages
+            ? "Backend API nahi mila (404 Not Found).\nGitHub Pages Python code nahi chala sakta. PC par 'start.bat' chala kar http://localhost:5050 kholein ya live backend URL connect karein."
+            : "API endpoint nahi mila (404). Server running hai ya nahi check karein.";
+        }
+      }
+      showError(errMsg);
       return;
     }
-    const { job_id } = await r.json();
+    const data = await r.json();
+    const { job_id } = data;
     currentJobId = job_id;
     addLog(`Job shuru hua: ${job_id}`, "success");
     startLogStream(job_id);
     startPolling(job_id);
   } catch (e) {
-    showError("Server se connection nahi hua: " + e.message);
+    let msg = "Server se connection nahi hua: " + e.message;
+    if (isGitHubPages && !apiBase) {
+      msg = "GitHub Pages static site hai aur Python backend ke bina dubbing nahi kar sakta. PC par start.bat chalaayein.";
+    }
+    showError(msg);
   }
 });
 
@@ -354,3 +447,4 @@ function resetApp() {
 
 btnAgain.addEventListener("click", resetApp);
 btnAgainErr.addEventListener("click", resetApp);
+

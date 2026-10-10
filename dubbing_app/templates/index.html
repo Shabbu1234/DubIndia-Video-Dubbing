@@ -49,6 +49,25 @@
       </p>
     </section>
 
+    <!-- Backend Server Banner (Auto-shown on GitHub Pages or when configuring backend) -->
+    <div class="backend-banner" id="backend-banner" hidden>
+      <div class="banner-icon">⚡</div>
+      <div class="banner-content">
+        <div class="banner-title">
+          <span>Backend Server Connection</span>
+          <span class="banner-badge" id="backend-status-badge">GitHub Pages Mode</span>
+        </div>
+        <p class="banner-desc">
+          GitHub Pages sirf static HTML host karta hai — Whisper, TTS aur FFmpeg ke liye Python backend chahiye.
+          Apne local server (<code>http://localhost:5050</code>) ya live tunnel (Ngrok / Cloudflare) ka URL connect karein.
+        </p>
+        <div class="banner-input-row">
+          <input type="text" id="backend-url-input" class="backend-url-input" placeholder="e.g. http://localhost:5050 ya https://xyz.ngrok-free.app" />
+          <button type="button" id="backend-save-btn" class="backend-save-btn">Connect Server</button>
+        </div>
+      </div>
+    </div>
+
     <!-- Upload Card -->
     <section class="card upload-card" id="upload-section">
       <div class="drop-zone" id="drop-zone">
